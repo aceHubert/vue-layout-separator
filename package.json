@@ -1,12 +1,17 @@
 {
   "name": "vue-layout-separator",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "layout auto separator",
   "private": false,
   "author": "Hubert<yi.xiang@live.cn>",
   "license": "MIT",
   "main": "dist/index.common.js",
   "style": "dist/index.css",
+  "keywords": [
+    "vue",
+    "layout",
+    "separator"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aceHubert/vue-layout-separator.git"

@@ -47,7 +47,7 @@
 </template>
 
 <script>
-const { Separator, SeparatorItem } = require('../src/index')
+import { Separator, SeparatorItem } from '../src/index'
 
 export default {
   name: 'app',

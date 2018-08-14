@@ -1,10 +1,7 @@
 import Separator from './separator'
 import SeparatorItem from './separator-item'
 
-const components = [
-  Separator,
-  SeparatorItem
-]
+const components = [Separator, SeparatorItem]
 
 const install = function (Vue, opts = {}) {
   components.forEach(component => {
@@ -17,9 +14,11 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue)
 }
 
-module.exports = {
-  Separator,
-  SeparatorItem
-}
+let version = '0.0.5'
 
-module.exports.default = module.exports
+export {version, install, Separator, SeparatorItem}
+
+export default components.reduce(function (components, item) {
+  components[item.name] = item
+  return components
+})

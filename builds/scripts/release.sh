@@ -17,7 +17,7 @@ git checkout -t origin/gh-pages
 
 # run the site build script
 rm -r *
-yarn run build
+yarn build
 
 # copy site to gh-pages folder
 cp -r ../site/* .
