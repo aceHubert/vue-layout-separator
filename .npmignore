@@ -4,6 +4,7 @@ test
 site
 public
 !dist
+dist/demo.html
 !next.es6.js
 .*
 override*.js

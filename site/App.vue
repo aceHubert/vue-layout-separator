@@ -28,7 +28,7 @@
             <p>height:auto</p>
           </separator-item>
           <separator-item :height="100"
-                          :max-height="100"
+                          :min-height="100"
                           style="background:#ddd ">
             BOTTOM
             <p>height:100px</p>

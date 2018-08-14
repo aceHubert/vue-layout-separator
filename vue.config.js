@@ -2,7 +2,9 @@ module.exports = {
   baseUrl: process.env.NODE_ENV === 'production'
     ? '/vue-layout-separator/'
     : '/',
-  outputDir: 'dist/site',
+  outputDir: process.env.TARGET === 'lib'
+    ? 'dist'
+    : 'dist/site',
   productionSourceMap: false,
   pages: {
     index: {

@@ -65,6 +65,7 @@ Here's a quick example to get you started:
  minWidth | Number | 34 | item min width.
  maxHeight | Number | - | item max height.
  minHeight | Number | 34 | item min height.
+ resize | event | - | Callback fired when the item size is changed.<br>__Signature:__ <br> function() => void
 
 
 ## Update 

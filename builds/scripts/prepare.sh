@@ -7,7 +7,9 @@ if [ $? = 0 ]; then
   # purge dist
   rm -fr dist
 
-  npm run build:lib
+  export TARGET=lib
+
+  yarn build:lib
 
 else
   echo 'Code cant be verify, plz check ~'
