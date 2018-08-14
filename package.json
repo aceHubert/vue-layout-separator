@@ -1,11 +1,24 @@
 {
-  "name": "vue-layout-splitting",
-  "version": "0.1.0",
-  "private": true,
+  "name": "vue-layout-separator",
+  "version": "0.0.1",
+  "description": "layout auto separator",
+  "private": false,
+  "author": "Hubert<yi.xiang@live.cn>",
+  "license": "MIT",
+  "main": "dist/index.common.js",
+  "style": "dist/index.css",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aceHubert/vue-layout-separator.git"
+  },
+  "homepage": "https://acehubert.github.io/vue-layout-separator/",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build:lib": "vue-cli-service build --target lib --name index ./src/index.js",
+    "lint": "vue-cli-service lint",
+    "prepubl¡sh": "./builds/scripts/prepare.sh",
+    "postpublish": "./builds/scripts/release.sh"
   },
   "dependencies": {
     "vue": "^2.5.17"
@@ -15,6 +28,8 @@
     "@vue/cli-plugin-eslint": "^3.0.0-rc.11",
     "@vue/cli-service": "^3.0.0-rc.11",
     "@vue/eslint-config-standard": "^3.0.0-rc.11",
+    "less": "^3.8.1",
+    "less-loader": "^4.1.0",
     "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
