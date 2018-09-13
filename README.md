@@ -53,22 +53,32 @@ Here's a quick example to get you started:
 
  name | type | default | description
  ---- | ---- | ------- | -----------
- direction | String | horizontal | direction of items,'horizontal' or 'vertical'.
+ vertical | Boolean | false | direction of items.
+ width | String/Number | 100% | container's width.
+ height | String/Number | 100% | container's height.
+
 
  ` SeparatorItem:`
 
   name | type | default | description
  ---- | ---- | ------- | -----------
- width | String/Number | auto | item width(300, 10% or auto), works with parent's direction in 'horizontal'.
- height | String/Number | auto | item height(same with width), works with parent's direction in 'vertical'.
+ width | String/Number | auto | item width(300, 10% or auto), works with parent's vertical with 'false'.
+ height | String/Number | auto | item height(same with width), works with parent's vertical width 'true'.
  maxWidth | Number | - | item max width.
  minWidth | Number | 34 | item min width.
  maxHeight | Number | - | item max height.
  minHeight | Number | 34 | item min height.
- resize | event | - | Callback fired when the item size is changed.<br>__Signature:__ <br> function() => void
+ noresize | Boolean | false | event 'resize' will not be triggered. <br>if you do not need it, better to set 'true'.
+ resize | event | - | Callback fired when the item size is changed.<br>__Signature:__ <br> function(el) => void
 
 
 ## Update 
+> 0.1.0
+* Added prop "vertical", "width", "height" in Container
+* Removed prop "direction" in Container
+
+> 0.0.12
+* Added prop "noresize" in Item.
 
 ## LICENSE
 [MIT](https://choosealicense.com/licenses/mit/)

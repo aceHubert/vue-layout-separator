@@ -14,7 +14,7 @@ if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue)
 }
 
-let version = '0.0.10'
+let version = '0.1.0'
 
 export {version, install, Separator, SeparatorItem}
 

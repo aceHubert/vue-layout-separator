@@ -1,82 +1,100 @@
 <template>
-  <div class="el-separator-line">
-    <div class="el-separator-line_icon"
-         @mousedown="handleMouseDown"> </div>
+  <div :class="{'el-separator-line':true, 'active':active}"
+       @mousedown="handleMouseDown">
+    <div class="el-separator-line_icon"> </div>
   </div>
 </template>
 
 <script>
-import { setStyle, getStyle } from '../../../libs/utils/dom'
+import { setStyle, getStyle, on, off } from '../../../libs/utils/dom'
 
 export default {
   name: 'SeparatorLine',
+  componentName: 'SeparatorLine',
   inject: ['rootSeparator'],
+  props: {
+    index: Number
+  },
+  computed: {
+    isHorizontal () {
+      return !this.rootSeparator.vertical
+    },
+    definition () {
+      return this.rootSeparator.definition
+    }
+  },
+  data () {
+    return {
+      active: false
+    }
+  },
   methods: {
+    setStyle (...styles) {
+      setStyle(this.$el, ...styles)
+    },
+    getStyle (name) {
+      return getStyle(this.$el, name)
+    },
     handleMouseDown (e) {
-      e.preventDefault()
-      e.stopPropagation()
-      const { $el } = this
+      e.stopImmediatePropagation()
 
-      this.last = {
+      const { index, rootSeparator, definition } = this
+      rootSeparator[definition.cursor] = true
+      this.active = true
+      this.lastPosition = {
         left: e.clientX,
         top: e.clientY
       }
-      this.totalWidth = $el.previousElementSibling.offsetWidth + $el.nextElementSibling.offsetWidth
-      this.totalHeight = $el.previousElementSibling.offsetHeight + $el.nextElementSibling.offsetHeight
-      window.addEventListener('mousemove', this.handleMouseMove)
-      window.addEventListener('mouseup', this.handleMouseUp)
+      let items, prevItem, nextItem, elPosition, minPosition, maxPosition
+
+      items = this.$parent.$children.filter(child => child.$options.componentName === 'SeparatorItem')
+      prevItem = items[index]
+      nextItem = items[index + 1]
+      elPosition = this.parseInt(this.getStyle(definition.position))
+      minPosition = elPosition - (prevItem.$el[definition.offset] - prevItem[definition.min])
+      if (nextItem[definition.max]) { minPosition = Math.max(minPosition, elPosition - (nextItem[definition.max] - nextItem.$el[definition.offset])) }
+      maxPosition = elPosition + (nextItem.$el[definition.offset] - nextItem[definition.min])
+      if (prevItem[definition.max]) { maxPosition = Math.min(maxPosition, elPosition + (prevItem[definition.max] - prevItem.$el[definition.offset])) }
+
+      console.log(minPosition, maxPosition)
+      Object.assign(this, { prevItem, nextItem, minPosition, maxPosition })
+
+      on(document, 'mousemove', this.handleMouseMove)
+      on(document, 'mouseup', this.handleMouseUp)
+      document.onselectstart = () => false
     },
     handleMouseMove (e) {
-      const { $el, last, totalWidth, totalHeight } = this
+      const { $el, rootSeparator, definition, lastPosition, prevItem, nextItem, minPosition, maxPosition } = this
       const { clientX, clientY } = e
-      const isHorizontal = this.rootSeparator.direction === 'horizontal'
-      const totalSize = isHorizontal ? totalWidth : totalHeight
-
-      let prevEl, prevElSize, prevElMaxSize, prevElMinSize, prevElStyle
-      prevEl = $el.previousElementSibling
-      prevElSize = isHorizontal ? prevEl.offsetWidth + (clientX - last.left) : prevEl.offsetHeight + (clientY - last.top)
-      prevElMaxSize = this.parseInt(getStyle(prevEl, isHorizontal ? 'maxWidth' : 'maxHeight'))
-      prevElMinSize = this.parseInt(getStyle(prevEl, isHorizontal ? 'minWidth' : 'minHeight'))
-      prevElStyle = { flexGrow: '0' }
-
-      if (prevElSize < prevElMinSize) {
-        prevElSize = prevElMinSize
+      let offset = (rootSeparator.vertical ? clientX : clientY) - lastPosition[definition.position]
+      let position = this.parseInt(this.getStyle(definition.position)) + offset
+      if (position > minPosition && position < maxPosition) {
+        Object.assign(this.lastPosition, { left: clientX, top: clientY })
+      } else if (position < minPosition) {
+        offset += minPosition - position
+        position = minPosition
+      } else if (position > maxPosition) {
+        offset += maxPosition - position
+        position = maxPosition
       }
-
-      let nextEl, nextElSize, nextElMaxSize, nextElMinSize, nextElStyle
-      nextEl = $el.nextElementSibling
-      nextElSize = totalSize - prevElSize
-      nextElMaxSize = this.parseInt(getStyle(nextEl, isHorizontal ? 'maxWidth' : 'maxHeight'))
-      nextElMinSize = this.parseInt(getStyle(nextEl, isHorizontal ? 'minWidth' : 'minHeight'))
-      nextElStyle = { flexGrow: '0' }
-
-      if (nextElSize < nextElMinSize) {
-        prevElSize = totalSize - nextElMinSize
-        nextElSize = nextElMinSize
-      }
-
-      if (prevElMaxSize) {
-        prevElSize = Math.min(prevElSize, prevElMaxSize)
-        nextElSize = totalSize - prevElSize
-        Object.assign(nextElStyle, isHorizontal ? { maxWidth: 'auto' } : { maxHeight: 'auto' })
-      } else if (nextElMaxSize) {
-        nextElSize = Math.min(nextElSize, nextElMaxSize)
-        prevElSize = totalSize - nextElSize
-        Object.assign(prevElStyle, isHorizontal ? { maxWidth: 'auto' } : { maxHeight: 'auto' })
-      }
-
-      setStyle(prevEl, Object.assign({}, prevElStyle, { flexBasis: prevElSize + 'px' }))
-      setStyle(nextEl, Object.assign({}, nextElStyle, { flexBasis: nextElSize + 'px' }))
-
-      Object.assign(this.last, { left: clientX, top: clientY })
+      this.setStyle(definition.position, `${position}px`)
+      prevItem.setStyle(definition.size, `${prevItem.$el[definition.offset] + offset}px`)
+      nextItem.setStyle(definition.size, `${nextItem.$el[definition.offset] - offset}px`)
+      nextItem.setStyle(definition.position, `${position + $el[definition.offset]}px`)
     },
     handleMouseUp (e) {
-      window.removeEventListener('mousemove', this.handleMouseMove)
-      window.removeEventListener('mouseup', this.handleMouseUp)
+      const { rootSeparator, definition } = this
+      rootSeparator[definition.cursor] = false
+      this.active = false
+      off(document, 'mousemove', this.handleMouseMove)
+      document.onselectstart = null
     },
     parseInt (value) {
       return value === 'none' || value === 'auto' ? null : parseInt(value)
     }
+  },
+  beforeDestroy () {
+    off(document, 'mouseup', this.handleMouseUp)
   }
 }
 </script>

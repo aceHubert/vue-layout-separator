@@ -1,6 +1,6 @@
 {
   "name": "vue-layout-separator",
-  "version": "0.0.12",
+  "version": "0.1.0",
   "description": "layout auto separator",
   "private": false,
   "author": "Hubert<yi.xiang@live.cn>",
@@ -21,14 +21,15 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:lib": "vue-cli-service build --target lib --name index ./src/index.js",
+    "build:wc": "vue-cli-service build --target wc --name separator ./src/separator/src/*.vue",
     "lint": "vue-cli-service lint",
     "prepubl¡sh": "./builds/scripts/prepare.sh",
     "postpublish": "./builds/scripts/release.sh"
   },
   "dependencies": {
-    "vue": "^2.5.17"
   },
   "devDependencies": {
+    "vue": "^2.5.17",
     "@vue/cli-plugin-babel": "^3.0.0-rc.11",
     "@vue/cli-plugin-eslint": "^3.0.0-rc.11",
     "@vue/cli-service": "^3.0.0-rc.11",
@@ -36,6 +37,9 @@
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
     "vue-template-compiler": "^2.5.17"
+  },
+  "peerDependencies":{
+    "vue": "^2.0.0"
   },
   "eslintConfig": {
     "root": true,

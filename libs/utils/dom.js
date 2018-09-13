@@ -2,60 +2,84 @@ import Vue from 'vue'
 const isServer = Vue.prototype.$isServer
 const SPECIAL_CHARS_REGEXP = /([\\:\-\\_]+(.))/g
 const MOZ_HACK_REGEXP = /^moz([A-Z])/
-const ieVersion = isServer ? 0 : Number(document.documentMode)
+const ieVersion = isServer
+  ? 0
+  : Number(document.documentMode)
 
 /* istanbul ignore next */
-// const trim = function (string) {
-//   return (string || '').replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/g, '')
-// }
+// const trim = function (string) {   return (string ||
+// '').replace(/^[\s\uFEFF]+|[\s\uFEFF]+$/g, '') }
 
 /* istanbul ignore next */
 const camelCase = function (name) {
   return name.replace(SPECIAL_CHARS_REGEXP, function (_, separator, letter, offset) {
-    return offset ? letter.toUpperCase() : letter
+    return offset
+      ? letter.toUpperCase()
+      : letter
   }).replace(MOZ_HACK_REGEXP, 'Moz$1')
 }
 
 /* istanbul ignore next */
-export const getStyle = ieVersion < 9 ? function (element, styleName) {
-  if (isServer) return
-  if (!element || !styleName) return null
-  styleName = camelCase(styleName)
-  if (styleName === 'float') {
-    styleName = 'styleFloat'
-  }
-  try {
-    switch (styleName) {
-      case 'opacity':
-        try {
-          return element.filters.item('alpha').opacity / 100
-        } catch (e) {
-          return 1.0
-        }
-      default:
-        return (element.style[styleName] || element.currentStyle ? element.currentStyle[styleName] : null)
+export const getStyle = ieVersion < 9
+  ? function (element, styleName) {
+    if (isServer) {
+      return
     }
-  } catch (e) {
-    return element.style[styleName]
+    if (!element || !styleName) {
+      return null
+    }
+    styleName = camelCase(styleName)
+    if (styleName === 'float') {
+      styleName = 'styleFloat'
+    }
+    try {
+      switch (styleName) {
+        case 'opacity':
+          try {
+            return element
+              .filters
+              .item('alpha')
+              .opacity / 100
+          } catch (e) {
+            return 1.0
+          }
+        default:
+          return (element.style[styleName] || element.currentStyle
+            ? element.currentStyle[styleName]
+            : null)
+      }
+    } catch (e) {
+      return element.style[styleName]
+    }
   }
-} : function (element, styleName) {
-  if (isServer) return
-  if (!element || !styleName) return null
-  styleName = camelCase(styleName)
-  if (styleName === 'float') {
-    styleName = 'cssFloat'
+  : function (element, styleName) {
+    if (isServer) {
+      return
+    }
+    if (!element || !styleName) {
+      return null
+    }
+    styleName = camelCase(styleName)
+    if (styleName === 'float') {
+      styleName = 'cssFloat'
+    }
+    try {
+      var computed = document
+        .defaultView
+        .getComputedStyle(element, '')
+      return element.style[styleName] || computed
+        ? computed[styleName]
+        : null
+    } catch (e) {
+      return element.style[styleName]
+    }
   }
-  try {
-    var computed = document.defaultView.getComputedStyle(element, '')
-    return element.style[styleName] || computed ? computed[styleName] : null
-  } catch (e) {
-    return element.style[styleName]
-  }
-}
 
 /* istanbul ignore next */
 export const setStyle = function (element, styleName, value) {
-  if (!element || !styleName) return
+  if (!element || !styleName) {
+    return
+  }
 
   if (typeof styleName === 'object') {
     for (var prop in styleName) {
@@ -66,9 +90,56 @@ export const setStyle = function (element, styleName, value) {
   } else {
     styleName = camelCase(styleName)
     if (styleName === 'opacity' && ieVersion < 9) {
-      element.style.filter = isNaN(value) ? '' : 'alpha(opacity=' + value * 100 + ')'
+      element.style.filter = isNaN(value)
+        ? ''
+        : 'alpha(opacity=' + value * 100 + ')'
     } else {
       element.style[styleName] = value
     }
   }
+}
+
+/* istanbul ignore next */
+export const on = (function () {
+  if (!isServer && document.addEventListener) {
+    return function (element, event, handler) {
+      if (element && event && handler) {
+        element.addEventListener(event, handler, false)
+      }
+    }
+  } else {
+    return function (element, event, handler) {
+      if (element && event && handler) {
+        element.attachEvent('on' + event, handler)
+      }
+    }
+  }
+})()
+
+/* istanbul ignore next */
+export const off = (function () {
+  if (!isServer && document.removeEventListener) {
+    return function (element, event, handler) {
+      if (element && event) {
+        element.removeEventListener(event, handler, false)
+      }
+    }
+  } else {
+    return function (element, event, handler) {
+      if (element && event) {
+        element.detachEvent('on' + event, handler)
+      }
+    }
+  }
+})()
+
+/* istanbul ignore next */
+export const once = function (el, event, fn) {
+  var listener = function () {
+    if (fn) {
+      fn.apply(this, arguments)
+    }
+    off(el, event, listener)
+  }
+  on(el, event, listener)
 }

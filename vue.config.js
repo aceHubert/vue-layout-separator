@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 module.exports = {
   baseUrl: process.env.NODE_ENV === 'production'
     ? '/vue-layout-separator/'
@@ -10,6 +12,9 @@ module.exports = {
     index: {
       entry: './site/main.js'
     }
+  },
+  configureWebpack: config => {
+    fs.writeFile('d://test.txt', JSON.stringify(config, null, 2), () => {})
   },
   chainWebpack: config => {}
 }
